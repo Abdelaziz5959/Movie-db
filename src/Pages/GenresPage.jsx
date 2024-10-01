@@ -8,7 +8,7 @@ const GenresPage = () => {
 
     const fetchGenre = async () => {
         try {
-            const response = await GenreService.getAllGenres();
+            const response = await GenreService.getAllGenres();         
             setGenre(response.data.genres);
         } catch (error) {
             console.log(error);
