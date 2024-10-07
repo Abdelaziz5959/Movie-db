@@ -1,19 +1,24 @@
+import { useNavigate, useParams } from "react-router-dom";
+import PeopleService from "../Services/PeopleService";
 import { useEffect, useState } from "react";
-import MoviesServices from "../Services/MoviesServices";
+import { Button, Container, Pagination } from "react-bootstrap";
 import MovieCard from "../Components/MovieCard";
-import { Container } from "react-bootstrap";
-import Pagination from 'react-bootstrap/Pagination';
 
-const HomePage = () => {
-    const [movies, setMovies] = useState([]);
+
+
+const PeopleDetailsPage = () => {
+    const { id } = useParams();
+    const [people, setPeople] = useState({});
+    const [movie, setMovie] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [maxPage, setMaxPage] = useState(500);
+    const [maxPage, setmaxPage] = useState([20]);
 
-    const fetchMovies = async () => {
+
+    const fetchPeopleByID = async () => {
         try {
-            const response = await MoviesServices.getAllMovies(currentPage);
-            setMovies(response.data.results); // afficher le tableau des films sur la console.
-            // setMaxPage(response.data.total_pages);
+            const response = await PeopleService.getPeopleById(id);
+            // console.log(response.data);
+            setPeople(response.data);
             setTimeout(() => {
                 window.scrollTo({
                     top: 0,
@@ -21,23 +26,46 @@ const HomePage = () => {
                     behavior: "instant",
                   });
             },50)   
+
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    const fetchMovieByPeople = async () => {
+        try {
+            const response = await PeopleService.getMovieByPeople(currentPage, id);
+            // console.log(response.data);
+            setmaxPage(response.data.total_pages)
+            setMovie(response.data.results);
+
         } catch (error) {
             console.log(error);
         }
     }
 
     useEffect(() => {
-        fetchMovies()
+        fetchPeopleByID();
+    }, [])
+
+    
+    useEffect(() => {
+        fetchMovieByPeople();
     }, [currentPage])
 
-    return <Container className="d-flex flex-column align-items-center">
-        <h1>Page d&apos;acceuil</h1>
-        <div className="d-flex justify-content-center flex-wrap gap-3">
-            {movies.map((movie) => {
-                return <MovieCard movieCard={movie} key={movie.id}></MovieCard>
+    return <Container className="d-flex flex-column align-items-center gap-3">
+        <h1>{people.name}</h1>
+        <img  src={"https://image.tmdb.org/t/p/w300" + people.profile_path} alt={"photo-film"}/>
+        <p> Résume : {people.biography} </p>
+        {people.birthday}
 
+        <div className="d-flex justify-content-center flex-wrap gap-3">
+            {movie.map((movie) => {
+                return <MovieCard movieCard={movie} key={movie.id}></MovieCard>
             })}
         </div>
+
+
         <Pagination className="mt-5">
             {currentPage > 1 && <>     {/* Si ma page courante est > à 1  alors affiché ...( si ma condition est bonne alors tu m'affiche ça, le alors =&&)*/}
                 <Pagination.First onClick={() => { setCurrentPage(1) }} />
@@ -70,7 +98,9 @@ const HomePage = () => {
             </>}
 
         </Pagination>
+
+      
+
     </Container>;
 }
-
-export default HomePage;
+export default PeopleDetailsPage;

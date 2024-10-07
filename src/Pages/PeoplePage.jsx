@@ -1,19 +1,26 @@
 import { useEffect, useState } from "react";
-import MoviesServices from "../Services/MoviesServices";
-import MovieCard from "../Components/MovieCard";
-import { Container } from "react-bootstrap";
-import Pagination from 'react-bootstrap/Pagination';
+import PeopleService from "../Services/PeopleService";
+import { useNavigate } from "react-router-dom";
+import { Button, Container, Pagination } from "react-bootstrap";
+import PeopleCard from "../Components/PeopleCard";
 
-const HomePage = () => {
-    const [movies, setMovies] = useState([]);
+
+const PeoplePage = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [maxPage, setMaxPage] = useState(500);
 
-    const fetchMovies = async () => {
-        try {
-            const response = await MoviesServices.getAllMovies(currentPage);
-            setMovies(response.data.results); // afficher le tableau des films sur la console.
-            // setMaxPage(response.data.total_pages);
+    const  [ people, setPeople] = useState ([]);
+
+    const navigate = useNavigate ();
+    const navigateTo = (people) => {
+        navigate("/people/"+people.id, {state : {"people" : people}});
+    }
+
+
+    const fetchActor = async () => {
+        try {  
+            const response = await PeopleService.GetAllPeople(currentPage);         
+            setPeople(response.data.results);
             setTimeout(() => {
                 window.scrollTo({
                     top: 0,
@@ -26,19 +33,21 @@ const HomePage = () => {
         }
     }
 
+
     useEffect(() => {
-        fetchMovies()
+        fetchActor()
     }, [currentPage])
-
-    return <Container className="d-flex flex-column align-items-center">
-        <h1>Page d&apos;acceuil</h1>
-        <div className="d-flex justify-content-center flex-wrap gap-3">
-            {movies.map((movie) => {
-                return <MovieCard movieCard={movie} key={movie.id}></MovieCard>
-
-            })}
-        </div>
-        <Pagination className="mt-5">
+   
+    
+    
+     return <Container className="d-flex flex-column align-items-center">
+     <h1>Acteur</h1>
+     <div className="d-flex justify-content-center flex-wrap gap-3">
+         {people.map((people) => {
+             return <PeopleCard peopleCard={people} key={people.id}></PeopleCard>
+         })}
+     </div>
+     <Pagination className="mt-5">
             {currentPage > 1 && <>     {/* Si ma page courante est > à 1  alors affiché ...( si ma condition est bonne alors tu m'affiche ça, le alors =&&)*/}
                 <Pagination.First onClick={() => { setCurrentPage(1) }} />
                 <Pagination.Prev onClick={() => { setCurrentPage(currentPage - 1) }} />
@@ -70,7 +79,9 @@ const HomePage = () => {
             </>}
 
         </Pagination>
-    </Container>;
-}
+     </Container>;
 
-export default HomePage;
+ 
+}
+ 
+export default PeoplePage ;

@@ -1,41 +1,38 @@
+import { useLocation, useParams } from "react-router-dom";
+import GenreServices from "../Services/GenreServices";
 import { useEffect, useState } from "react";
-import MoviesServices from "../Services/MoviesServices";
 import MovieCard from "../Components/MovieCard";
-import { Container } from "react-bootstrap";
-import Pagination from 'react-bootstrap/Pagination';
+import { Container, Pagination } from "react-bootstrap";
 
-const HomePage = () => {
+const GenreDetailsPage = () => {
+
+    const { id } = useParams();
+    const location = useLocation();
     const [movies, setMovies] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [maxPage, setMaxPage] = useState(500);
+    const[maxPage, setMaxPage] = useState(500);
 
-    const fetchMovies = async () => {
+    const fetchMoviesByGenreID = async () => {
         try {
-            const response = await MoviesServices.getAllMovies(currentPage);
-            setMovies(response.data.results); // afficher le tableau des films sur la console.
-            // setMaxPage(response.data.total_pages);
-            setTimeout(() => {
-                window.scrollTo({
-                    top: 0,
-                    left: 0,
-                    behavior: "instant",
-                  });
-            },50)   
+            const response = await GenreServices.getMoviesByGenreID(currentPage, id)
+            setMovies(response.data.results);
+                 
         } catch (error) {
             console.log(error);
+
         }
     }
 
     useEffect(() => {
-        fetchMovies()
+        fetchMoviesByGenreID();
     }, [currentPage])
 
-    return <Container className="d-flex flex-column align-items-center">
-        <h1>Page d&apos;acceuil</h1>
+    console.log(location);  
+    return <Container className="d-flex flex-column align-items-center"> 
+        <h1>{location.state.genre.name} </h1>
         <div className="d-flex justify-content-center flex-wrap gap-3">
             {movies.map((movie) => {
                 return <MovieCard movieCard={movie} key={movie.id}></MovieCard>
-
             })}
         </div>
         <Pagination className="mt-5">
@@ -70,7 +67,8 @@ const HomePage = () => {
             </>}
 
         </Pagination>
+
     </Container>;
 }
 
-export default HomePage;
+export default GenreDetailsPage;
