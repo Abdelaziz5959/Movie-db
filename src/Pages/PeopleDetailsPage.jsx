@@ -20,7 +20,7 @@ const PeopleDetailsPage = () => {
             // console.log(response.data);
             setPeople(response.data);
             setTimeout(() => {
-                window.scrollTo({
+                list.current.scrollTo({
                     top: 0,
                     left: 0,
                     behavior: "instant",
